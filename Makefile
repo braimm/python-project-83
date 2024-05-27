@@ -9,16 +9,7 @@ dev:
 	poetry run flask --app page_analyzer:app --debug run 
 
 build:
-	poetry build
-
-publish:
-	poetry publish --dry-run
-
-package-install:
-	python3 -m pip install dist/*.whl
-
-package-reinstall:
-	pip install --force-reinstall dist/*.whl
+	./build.sh
 
 lint:
 	poetry run flake8 page_analyzer
