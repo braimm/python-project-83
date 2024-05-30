@@ -1,41 +1,21 @@
 {% extends "main_layout.html" %}
-
-
-{% block flashes %} 
-    {% if messages %}
-        <ul class=flashes>
-            {% for category, message in messages %}
-            {% if category == 'success' %}
-              <div class="alert alert-success" role="alert">{{ message }}</div>
-            {% elif category == 'info' %}
-              <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% else %}
-              <div class="alert alert-danger" role="alert">{{ message }}</div>
-            {% endif %}
-          {% endfor %}
-        </ul>
-    {% endif %}
-{% endblock %}
-
 {% block content %} 
-    <div class="container-lg mt-3">
-      <h1>Сайт: https://www.google.com</h1>
-
-    
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover text-nowrap" data-test="url">
+<div class="container-lg mt-3">
+<h1>Сайт: {{url[1]}}</h1>    
+<div class="table-responsive">
+   <table class="table table-bordered table-hover text-nowrap" data-test="url">
       <tbody>
         <tr>
           <td>ID</td>
-          <td>1</td>
+          <td>{{url[0]}}</td>
         </tr>
         <tr>
           <td>Имя</td>
-          <td>https://www.google.com</td>
+          <td>{{url[1]}}</td>
         </tr>
         <tr>
           <td>Дата создания</td>
-          <td>2024-05-27</td>
+          <td>{{url[2]}}</td>
         </tr>
       </tbody>
     </table>
