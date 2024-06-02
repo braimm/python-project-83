@@ -13,7 +13,22 @@
   </tr>
   </thead>
   <tbody>
-    
+    {% for url in urls %} 
+    <tr>
+      <td>{{url.id}}</td>
+      <td>
+        <a href="/urls/{{url.id}}">
+          {{url.name}}
+        </a>
+      </td>
+      
+      <td>{{url.max or ''}}</td>
+      
+      
+      <td>{{url.status_code or ''}}</td>
+      
+    </tr>
+    {% endfor %}
   </tbody>
 </table>
 </div>
