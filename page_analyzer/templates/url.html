@@ -1,6 +1,5 @@
 {% extends "main_layout.html" %}
 {% block content %} 
-<div class="container-lg mt-3">
 <h1>Сайт: {{url.name}}</h1>    
 <div class="table-responsive">
    <table class="table table-bordered table-hover text-nowrap" data-test="url">
@@ -23,7 +22,7 @@
 
     <h2 class="mt-5 mb-3">Проверки</h2>
     <form method="post" action="{{url_for('url_check', id=url.id)}}">
-    <input type="submit" class="btn btn-primary" value="Запустить проверку">
+      <input type="submit" class="btn btn-primary" value="Запустить проверку">
     </form>
     
   <div>
@@ -41,17 +40,15 @@
     <tbody>
       {% for check in checks %}
         <tr>
-          <td>{{check.id}}</td>
-          <td>Код ответа</td>
-          <td>h1</td>
-          <td>title</td>
-          <td>description</td>
-          <td>{{check.created_at}}</td>
+          <td>{{ check.id }}</td>
+          <td>{{ check.status_code }}</td>
+          <td>{{ check.h1 }}</td>
+          <td>{{ check.title }}</td>
+          <td>{{ check.description }}</td>
+          <td>{{ check.created_at }}</td>
         </tr>
       {% endfor %}
     </tbody>
     </table>
   </div>
-
-    </div>
   {% endblock %}

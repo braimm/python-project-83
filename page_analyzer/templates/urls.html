@@ -1,6 +1,5 @@
 {% extends "main_layout.html" %}
-{% block content %} 
-<div class="container-lg mt-3">
+{% block content %}
 <h1>Сайты</h1> 
 <div class="table-responsive">
 <table class="table table-bordered table-hover text-nowrap" data-test="urls">
@@ -15,22 +14,13 @@
   <tbody>
     {% for url in urls %} 
     <tr>
-      <td>{{url.id}}</td>
-      <td>
-        <a href="/urls/{{url.id}}">
-          {{url.name}}
-        </a>
-      </td>
-      
-      <td>{{url.max or ''}}</td>
-      
-      
-      <td>{{url.status_code or ''}}</td>
-      
+      <td>{{ url.id }}</td>
+      <td> <a href="/urls/{{url.id}}"> {{ url.name }} </a> </td>
+      <td> {{ url.max or '' }} </td>
+      <td> {{ url.status_code or '' }} </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-</div>
 </div>
 {% endblock %}

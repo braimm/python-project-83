@@ -9,10 +9,32 @@ import datetime
 from bs4 import BeautifulSoup
 import requests
 
+#DATABASE_URL = 'postgresql://dbuser:pass123@localhost:5432/pa_db'
+
 
 app = Flask(__name__)
 #app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.secret_key = "secret_key"
+#app.secret_key = "secret_key"
+app.secret_key = os.getenv('SECRET_KEY')
+
+
+def connect_db():
+    load_dotenv()
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    connection = psycopg2.connect(DATABASE_URL)
+    cursor = connection.cursor(cursor_factory=extras.NamedTupleCursor)
+    return connection, cursor
+
+
+def show_page_errors_db():
+    errors = 'Ошибка при работе с базой данных'
+    return render_template('errors.html', errors=errors)
+
+
+def close_connection_db(cursor, connection):
+    cursor.close
+    connection.close
+    
 
 def validate_url(url):
     if validators.url(url) is not True:
@@ -22,6 +44,7 @@ def validate_url(url):
         flash('URL превышает 255 символов', 'danger')
         return True
     return False
+
 
 def get_norm_url(url):
     result = parse.urlparse(url)
@@ -34,12 +57,10 @@ def index():
 
 
 @app.get('/urls')
-def urls():
-    DATABASE_URL = 'postgresql://dbuser:pass123@localhost:5432/pa_db'         
-    conn = psycopg2.connect(DATABASE_URL)
-    cursor = conn.cursor(cursor_factory=extras.NamedTupleCursor)
-    #cursor.execute("SELECT * FROM urls")
-    cursor.execute("""
+def urls_list():    
+    try:
+        connection, cursor = connect_db()
+        cursor.execute("""
             SELECT
                 urls.id,
                 urls.name,
@@ -50,18 +71,17 @@ def urls():
             GROUP BY urls.id, urls.name, url_checks.status_code
             ORDER BY urls.id DESC;
         """)
-    urls = cursor.fetchall()
-    print(urls)
+        urls = cursor.fetchall()
+    except Exception:
+        show_page_errors_db()
+    finally:
+        close_connection_db(cursor, connection)
+        
     return render_template('urls.html', urls=urls)
 
 
 @app.post('/urls')
-def add_urls():
-    load_dotenv()
-    #DATABASE_URL = 'postgresql://postgres:pass123@localhost:5432/pa_db'
-    DATABASE_URL = 'postgresql://dbuser:pass123@localhost:5432/pa_db'
-    #DATABASE_URL = os.getenv('DATABASE_URL')
-    conn = psycopg2.connect(DATABASE_URL)
+def add_url():
     url = request.form.get('url')
     errors = validate_url(url)
     if errors:
@@ -69,58 +89,68 @@ def add_urls():
         return render_template('index.html', url=url, messages=messages)
     url = get_norm_url(url)
     date = datetime.datetime.now().date()
-    cursor = conn.cursor(cursor_factory=extras.NamedTupleCursor)
-    cursor.execute("SELECT * FROM urls WHERE name = %s;", (url,))
-    record = cursor.fetchone()
-    if record is None:
-        cursor.execute("INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id;", (url, date))
-        id = cursor.fetchone()[0]
-        conn.commit()
-        flash('Страница успешно добавлена', 'success')
-    else:
-        flash('Страница уже существует', 'info')
-        id = record[0]
-    cursor.close()
-    conn.close()    
-    return redirect(url_for('url', id=id))
+    try:
+        connection, cursor = connect_db()
+        cursor.execute("SELECT * FROM urls WHERE name = %s;", (url,))
+        record = cursor.fetchone()
+        if record is None:
+            cursor.execute("INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id;", (url, date))
+            id = cursor.fetchone()[0]
+            connection.commit()
+            flash('Страница успешно добавлена', 'success')
+        else:
+            flash('Страница уже существует', 'info')
+            id = record[0]
+    except Exception:
+        show_page_errors_db()
+    finally:
+        close_connection_db(cursor, connection)
+    return redirect(url_for('url_page', id=id))
 
 
 @app.route('/urls/<id>')
-def url(id):
-    load_dotenv()
-    #DATABASE_URL = 'postgresql://postgres:pass123@localhost:5432/pa_db'
-    DATABASE_URL = 'postgresql://dbuser:pass123@localhost:5432/pa_db'
-    #DATABASE_URL = os.getenv('DATABASE_URL')
-    conn = psycopg2.connect(DATABASE_URL)
-    cursor = conn.cursor(cursor_factory=extras.NamedTupleCursor)
-    cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
-    url = cursor.fetchone()
-    cursor.execute("SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC;", (id,))
-    checks = cursor.fetchall()
-    print(checks)
-    messages = get_flashed_messages(with_categories=True)
-    conn.commit()
-    cursor.close()
-    conn.close()
+def url_page(id):
+    try:
+        connection, cursor = connect_db()
+        cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
+        url = cursor.fetchone()
+        cursor.execute("SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC;", (id,))
+        checks = cursor.fetchall()
+        messages = get_flashed_messages(with_categories=True)
+    except Exception:
+        show_page_errors_db()
+    finally:
+        close_connection_db(cursor, connection)
     return render_template('url.html', messages=messages, url=url, checks=checks)
 
 
 @app.post('/urls/<id>/checks')
 def url_check(id):
-    load_dotenv()
-    #DATABASE_URL = 'postgresql://postgres:pass123@localhost:5432/pa_db'
-    DATABASE_URL = 'postgresql://dbuser:pass123@localhost:5432/pa_db'
-    #DATABASE_URL = os.getenv('DATABASE_URL')
-    conn = psycopg2.connect(DATABASE_URL)
-    cursor = conn.cursor(cursor_factory=extras.NamedTupleCursor)
     date = datetime.datetime.now().date()
-    cursor.execute("INSERT INTO url_checks (url_id, created_at) VALUES (%s, %s) RETURNING id;", (id, date))
-    #id_check = cursor.fetchone()[0]
-    conn.commit()
-    flash('Страница успешно проверена', 'success')
-    cursor.close()
-    conn.close()
+    
+    try:
+        connection, cursor = connect_db()
+        cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
+        url = cursor.fetchone()
+    
+        response = requests.get(url.name)
+        if not response.ok:
+            flash('Произошла ошибка при проверке', 'danger')
+            return redirect(url_for('url_page', id=id), 302)
+        status_code = response.status_code
 
-    #flash('Произошла ошибка при проверке', 'danger')
-    return redirect(url_for('url', id=id), 302)
+        content = response.text
+        soup = BeautifulSoup(content,'html.parser')
 
+        title = soup.title.text if soup.title.text else ''
+        h1 = soup.find("h1") if soup.find("h1") else ''
+        description = soup.find("meta", {'name': 'description'}).get('content', '')
+
+        cursor.execute("INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;", (id, status_code, h1, title, description, date))
+        connection.commit()
+        flash('Страница успешно проверена', 'success')
+    except Exception:
+        show_page_errors_db()
+    finally:
+        close_connection_db(cursor, connection)
+    return redirect(url_for('url_page', id=id), 302)
