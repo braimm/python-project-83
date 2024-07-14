@@ -13,4 +13,3 @@ build:
 
 lint:
 	poetry run flake8 page_analyzer
-	poetry run flake8 tests
