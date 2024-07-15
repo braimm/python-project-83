@@ -151,7 +151,8 @@ def url_check(id):
 
         title = soup.title.text if soup.title.text else ''
         h1 = soup.find("h1") if soup.find("h1") else ''
-        descr = soup.find("meta", {'name': 'description'}).get('content', '')
+        descr = soup.find(
+            "meta", attrs={'name': 'description'}).get('content', '')
 
         cursor.execute("""
             INSERT INTO url_checks
