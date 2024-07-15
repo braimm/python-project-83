@@ -161,7 +161,7 @@ def url_check(id):
             RETURNING id;
         """, (id, status_code, h1, title, descr, date))
         connection.commit()
-        flash('Страница успешно проверена', 'alert-success')
+        flash('Страница успешно проверена', 'success')
 
     # except requests.RequestException:
     #    flash('Произошла ошибка при проверке', 'danger')
@@ -170,4 +170,4 @@ def url_check(id):
         show_page_errors_db()
     finally:
         close_connection_db(cursor, connection)
-    return redirect(url_for('url_page', id=id), 302)
+    return redirect(url_for('url_page', id=id))
