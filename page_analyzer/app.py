@@ -161,7 +161,7 @@ def url_check(id):
             RETURNING id;
         """, (id, status_code, h1, title, descr, date))
         connection.commit()
-        flash('Страница успешно проверена', 'success')
+        flash('Страница успешно проверена', 'alert-success')
 
     # except requests.RequestException:
     #    flash('Произошла ошибка при проверке', 'danger')
