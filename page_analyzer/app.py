@@ -138,8 +138,12 @@ def url_check(id):
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         url = cursor.fetchone()
 
-        response = requests.get(url.name, timeout=2)
-        response.raise_for_status()
+        # response = requests.get(url.name, timeout=2)
+        response = requests.get(url.name)
+        if not response.ok:
+            flash('Произошла ошибка при проверке', 'danger')
+            return redirect(url_for('url_page', id=id), 302)
+        # response.raise_for_status()
         status_code = response.status_code
 
         content = response.text
@@ -158,9 +162,9 @@ def url_check(id):
         connection.commit()
         flash('Страница успешно проверена', 'success')
 
-    except requests.RequestException:
-        flash('Произошла ошибка при проверке', 'danger')
-        return redirect(url_for('url_page', id=id), 302)
+    # except requests.RequestException:
+    #    flash('Произошла ошибка при проверке', 'danger')
+    #    return redirect(url_for('url_page', id=id), 302)
     except Exception:
         show_page_errors_db()
     finally:
