@@ -83,7 +83,7 @@ def add_url():
     errors = validate_url(url)
     if errors:
         messages = get_flashed_messages(with_categories=True)
-        return render_template('index.html', url=url, messages=messages)
+        return render_template('index.html', url=url, messages=messages), 422
     url = get_norm_url(url)
     date = datetime.datetime.now().date()
     try:
