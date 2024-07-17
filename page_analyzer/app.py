@@ -117,13 +117,12 @@ def url_page(id):
         cursor.execute("""
             SELECT * FROM url_checks WHERE url_id = %s ORDER BY id DESC;
         """, (id,))
-
         checks = cursor.fetchall()
-        messages = get_flashed_messages(with_categories=True)
     except Exception:
         show_page_errors_db()
     finally:
         close_connection_db(cursor, connection)
+    messages = get_flashed_messages(with_categories=True)
     return render_template('url.html',
                            messages=messages,
                            url=url,
