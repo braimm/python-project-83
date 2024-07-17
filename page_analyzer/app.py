@@ -105,7 +105,7 @@ def add_url():
         show_page_errors_db()
     finally:
         close_connection_db(cursor, connection)
-    return redirect(url_for('url_page', id=id))
+    return redirect(url_for('url_page', id=id), 302)
 
 
 @app.route('/urls/<id>')
@@ -170,4 +170,4 @@ def url_check(id):
         show_page_errors_db()
     finally:
         close_connection_db(cursor, connection)
-    return redirect(url_for('url_page', id=id))
+    return redirect(url_for('url_page', id=id), 302)
