@@ -148,10 +148,8 @@ def url_check(id):
         #h1 = soup.find('h1')
         h1 = 'Do not expect a miracle, miracles yourself!'
         title = soup.title.text if soup.title.text else ''
-        #h1 = '234234'
-        descr = '34343434'
-        #descr = soup.find(
-        #    "meta", attrs={'name': 'description'}).get('content', '')
+        descr = soup.find(
+            "meta", attrs={'name': 'description'}).get('content', '')
 
         cursor.execute("""
             INSERT INTO url_checks
