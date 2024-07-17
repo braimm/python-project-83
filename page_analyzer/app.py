@@ -29,8 +29,8 @@ def show_page_errors_db():
 
 
 def close_connection_db(cursor, connection):
-    cursor.close
-    connection.close
+    cursor.close()
+    connection.close()
 
 
 def validate_url(url):
