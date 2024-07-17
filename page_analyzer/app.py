@@ -144,9 +144,7 @@ def url_check(id):
         content = response.text
         soup = BeautifulSoup(content, 'html.parser')
 
-        # h1 = soup.find('h1') if soup.find('h1') else ''
-        # h1 = soup.find('h1')
-        h1 = 'Do not expect a miracle, miracles yourself!'
+        h1 = soup.h1.text if soup.h1 else ''
         title = soup.title.text if soup.title.text else ''
         descr = soup.find(
             "meta", attrs={'name': 'description'}).get('content', '')
