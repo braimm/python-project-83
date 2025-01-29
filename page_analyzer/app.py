@@ -8,6 +8,7 @@ import validators
 from urllib import parse
 import datetime
 from bs4 import BeautifulSoup
+
 import requests
 
 
