@@ -27,7 +27,7 @@ def urls_list():
     return render_template('urls.html', urls=urls)
 
 
-@app.post('/')
+@app.post('/urls')
 def add_url():
     url = request.form.get('url')
     errors = validate_url(url)
