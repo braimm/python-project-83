@@ -42,7 +42,8 @@ def get_url_info(id, conn):
 def get_url_by_name(url, conn):
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
         cur.execute("SELECT * FROM urls WHERE name = %s;", (url,))
-    return url
+        result = cur.fetchone()
+    return result
 
 
 def add_url(url, conn):
@@ -67,7 +68,7 @@ def get_url_by_id(id, conn):
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
         cur.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         url = cur.fetchone()
-        return url
+    return url
 
 
 def add_url_check(id, conn):
