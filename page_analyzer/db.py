@@ -10,21 +10,38 @@ def connect_db(db_url):
 
 
 def get_urls_list(conn):
-    with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
+    with conn.cursor(cursor_factory=extras.DictCursor) as cur:
         cur.execute("""
             SELECT
-                urls.id,
-                urls.name,
-                MAX(url_checks.created_at),
-                url_checks.status_code
+                id,
+                name
             FROM urls
-            LEFT JOIN url_checks ON urls.id = url_checks.url_id
-            GROUP BY urls.id, urls.name, url_checks.status_code
             ORDER BY urls.id DESC;
         """)
-
         urls = cur.fetchall()
-    return urls
+
+        cur.execute("""
+                SELECT
+                    url_id,
+                    MAX(created_at),
+                    status_code
+                FROM url_checks
+                GROUP BY url_id, status_code;
+        """)
+        checks = cur.fetchall()
+
+        urls_with_checks = []
+        check_found = {}
+        for url in urls:
+            for check in checks:
+                if url['id'] == check['url_id']:
+                    check_found = check
+            if check_found:
+                urls_with_checks += {**url, **check_found},
+                check_found = {}
+            else:
+                urls_with_checks += {**url},
+    return urls_with_checks
 
 
 def get_url_info(id, conn):
@@ -53,6 +70,7 @@ def add_url(url, conn):
             INSERT INTO urls (name, created_at)
             VALUES (%s, %s) RETURNING id;
         """, (url, date))
+
         id = cur.fetchone()[0]
     return id
 
