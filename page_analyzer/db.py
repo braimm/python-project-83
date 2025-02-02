@@ -48,20 +48,13 @@ def get_url_by_name(url, conn):
 
 def add_url(url, conn):
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
-        record = get_url_by_name(url, conn)
-        if record is None:
-            date = datetime.datetime.now().date()
-            cur.execute("""
-                INSERT INTO urls (name, created_at)
-                VALUES (%s, %s) RETURNING id;
-            """, (url, date))
-
-            id = cur.fetchone()[0]
-            status = "added"
-        else:
-            status = "exists"
-            id = record[0]
-    return status, id
+        date = datetime.datetime.now().date()
+        cur.execute("""
+            INSERT INTO urls (name, created_at)
+            VALUES (%s, %s) RETURNING id;
+        """, (url, date))
+        id = cur.fetchone()[0]
+    return id
 
 
 def get_url_by_id(id, conn):

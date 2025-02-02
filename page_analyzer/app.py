@@ -2,7 +2,8 @@ from flask import Flask, render_template
 from flask import request, url_for, redirect, flash, get_flashed_messages
 from dotenv import load_dotenv
 import os
-from .db import get_urls_list, connect_db, get_url_info, add_url, add_url_check
+from .db import get_url_info, add_url, add_url_check, get_url_by_name
+from .db import get_urls_list, connect_db
 from .html import show_page_errors_db
 from .validators import validate_url, get_norm_url
 import requests
@@ -41,12 +42,13 @@ def adding_url():
 
     try:
         with connect_db(DATABASE_URL) as conn:
-            status, id = add_url(url, conn)
-            match status:
-                case 'added':
-                    flash('Страница успешно добавлена', 'success')
-                case 'exists':
-                    flash('Страница уже существует', 'info')
+            record = get_url_by_name(url, conn)
+            if record:
+                id = record[0]
+                flash('Страница уже существует', 'info')
+            else:
+                id = add_url(url, conn)
+                flash('Страница успешно добавлена', 'success')
     except Exception:
         show_page_errors_db()
     return redirect(url_for('url_page', id=id), 302)
