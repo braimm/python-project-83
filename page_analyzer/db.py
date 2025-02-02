@@ -3,12 +3,11 @@ import os
 import psycopg2
 from psycopg2 import extras
 import datetime
-from .html_utils import get_page_info
+from .html import get_page_info
 
 
-def connect_db():
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    connection = psycopg2.connect(DATABASE_URL)
+def connect_db(db_url):
+    connection = psycopg2.connect(db_url)
     return connection
 
 

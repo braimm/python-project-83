@@ -2,8 +2,8 @@ from flask import Flask, render_template
 from flask import request, url_for, redirect, flash, get_flashed_messages
 from dotenv import load_dotenv
 import os
-from .db_utils import get_urls_list, get_url_info, add_url_db, add_url_check
-from .html_utils import show_page_errors_db
+from .db import get_urls_list, get_url_info, add_url_db, add_url_check
+from .html import show_page_errors_db
 from .validators import validate_url, get_norm_url
 import requests
 
@@ -11,6 +11,7 @@ import requests
 app = Flask(__name__)
 load_dotenv(override=True)
 app.secret_key = os.getenv('SECRET_KEY')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 @app.get('/')
