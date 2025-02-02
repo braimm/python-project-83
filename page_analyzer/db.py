@@ -72,14 +72,13 @@ def get_url_by_id(id, conn):
 
 
 def add_url_check(id, conn):
-    with connect_db() as conn:
-        with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
-            url = get_url_by_id(id, conn)
-            h1, title, descr, status_code = get_page_info(url)
-            date = datetime.datetime.now().date()
-            cur.execute("""
-                INSERT INTO url_checks
-                (url_id, status_code, h1, title, description, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                RETURNING id;
-            """, (id, status_code, h1, title, descr, date))
+    with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
+        url = get_url_by_id(id, conn)
+        h1, title, descr, status_code = get_page_info(url)
+        date = datetime.datetime.now().date()
+        cur.execute("""
+            INSERT INTO url_checks
+            (url_id, status_code, h1, title, description, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id;
+        """, (id, status_code, h1, title, descr, date))
