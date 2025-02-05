@@ -5,7 +5,7 @@ import os
 from .db import get_url_info, add_url, add_url_check
 from .db import get_urls_list, connect_db, get_url_by_name, get_url_by_id
 from .html import get_data_check, show_page_errors_db
-from .validators import get_errors_validate_url, get_norm_url
+from .validators import get_errors_validate_url, get_norm_url, prepare_write_db
 import requests
 
 
@@ -81,9 +81,10 @@ def url_check(id):
         with connect_db(DATABASE_URL) as conn:
             url = get_url_by_id(id, conn)
             data_check = get_data_check(url)
+            data_check = prepare_write_db(data_check)
             add_url_check(id, data_check, conn)
             flash('Страница успешно проверена', 'success')
-    except requests.RequestException:
+    except (requests.RequestException, ValueError):
         flash('Произошла ошибка при проверке', 'danger')
         return redirect(url_for('url_page', id=id), 302)
     except Exception:
