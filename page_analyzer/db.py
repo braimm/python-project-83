@@ -1,7 +1,6 @@
 import psycopg2
 from psycopg2 import extras
 import datetime
-from .html import get_page_info
 
 
 def connect_db(db_url):
@@ -82,10 +81,9 @@ def get_url_by_id(id, conn):
     return url
 
 
-def add_url_check(id, conn):
+def add_url_check(id, data_check, conn):
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
-        url = get_url_by_id(id, conn)
-        h1, title, descr, status_code = get_page_info(url)
+        h1, title, descr, status_code = data_check
         date = datetime.datetime.now().date()
         cur.execute("""
             INSERT INTO url_checks

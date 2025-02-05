@@ -1,16 +1,13 @@
 import validators
-from flask import flash
 from urllib import parse
 
 
-def validate_url(url):
+def get_errors_validate_url(url):
     if validators.url(url) is not True:
-        flash('Некорректный URL', 'danger')
-        return True
+        return 'bad_url'
     if len(url) > 255:
-        flash('URL превышает 255 символов', 'danger')
-        return True
-    return False
+        return 'long_url'
+    return None
 
 
 def get_norm_url(url):

@@ -2,10 +2,10 @@ from flask import Flask, render_template
 from flask import request, url_for, redirect, flash, get_flashed_messages
 from dotenv import load_dotenv
 import os
-from .db import get_url_info, add_url, add_url_check, get_url_by_name
-from .db import get_urls_list, connect_db
-from .html import show_page_errors_db
-from .validators import validate_url, get_norm_url
+from .db import get_url_info, add_url, add_url_check
+from .db import get_urls_list, connect_db, get_url_by_name, get_url_by_id
+from .html import get_data_check, show_page_errors_db
+from .validators import get_errors_validate_url, get_norm_url
 import requests
 
 
@@ -33,8 +33,15 @@ def urls_list():
 @app.post('/urls')
 def adding_url():
     url = request.form.get('url')
-    errors = validate_url(url)
+    errors = get_errors_validate_url(url)
     if errors:
+        match errors:
+            case 'bad_url':
+                flash('Некорректный URL', 'danger')
+            case 'long_url':
+                flash('URL превышает 255 символов', 'danger')
+            case _:
+                pass
         messages = get_flashed_messages(with_categories=True)
         return render_template('index.html', url=url, messages=messages), 422
 
@@ -72,7 +79,9 @@ def url_page(id):
 def url_check(id):
     try:
         with connect_db(DATABASE_URL) as conn:
-            add_url_check(id, conn)
+            url = get_url_by_id(id, conn)
+            data_check = get_data_check(url)
+            add_url_check(id, data_check, conn)
             flash('Страница успешно проверена', 'success')
     except requests.RequestException:
         flash('Произошла ошибка при проверке', 'danger')

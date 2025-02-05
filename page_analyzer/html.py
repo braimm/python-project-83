@@ -8,7 +8,7 @@ def show_page_errors_db():
     return render_template('errors.html', errors=errors)
 
 
-def get_page_info(url):
+def get_data_check(url):
     page_requested = requests.get(url.name, timeout=2)
     page_requested.raise_for_status()
     status_code = page_requested.status_code
@@ -20,4 +20,4 @@ def get_page_info(url):
     title = soup.title.text if soup.title.text else ''
     descr = soup.find(
         "meta", attrs={'name': 'description'}).get('content', '')
-    return h1, title, descr, status_code
+    return (h1, title, descr, status_code)
