@@ -1,5 +1,6 @@
 import requests
-from bs4 import BeautifulSoup, Tag
+# from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from .my_types import Url_record_NTuple
 
 
