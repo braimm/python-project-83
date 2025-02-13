@@ -22,6 +22,8 @@ requests = "^2.32.3"
 flake8 = "^7.0.0"
 mypy = "^1.15.0"
 types-psycopg2 = "^2.9.21.20250121"
+types-beautifulsoup4 = "^4.12.0.20250204"
+types-requests = "^2.32.0.20241016"
 
 [build-system]
 requires = ["poetry-core"]

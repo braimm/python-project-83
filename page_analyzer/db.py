@@ -75,7 +75,7 @@ def get_url_info(id: int, conn: connection) -> \
 
 @catch_exceptions_psycopg2
 def get_url_by_name(url: str, conn: connection) -> \
-                Optional[NamedTuple]:
+                        Optional[NamedTuple]:
 
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
         cur.execute("SELECT * FROM urls WHERE name = %s;", (url,))
@@ -84,7 +84,9 @@ def get_url_by_name(url: str, conn: connection) -> \
 
 
 @catch_exceptions_psycopg2
-def add_url(url: str, conn: connection) -> int | None:
+def add_url(url: str, conn: connection) -> \
+                        Optional[NamedTuple]:
+
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
         date = datetime.datetime.now().date()
         cur.execute("""
@@ -93,7 +95,7 @@ def add_url(url: str, conn: connection) -> int | None:
         """, (url, date))
 
         record = cur.fetchone()
-    return record.id if record else None
+    return record if record else None
 
 
 @catch_exceptions_psycopg2

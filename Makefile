@@ -13,6 +13,9 @@ build:
 
 mypy:
 	poetry run mypy page_analyzer/db.py
+	poetry run mypy page_analyzer/app.py
+	poetry run mypy page_analyzer/html.py
+	poetry run mypy page_analyzer/validators.py
 
 lint:
 	poetry run flake8 page_analyzer
