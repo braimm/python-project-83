@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask import request, url_for, redirect, flash, get_flashed_messages
-# from flask.wrappers import Response
 from werkzeug.wrappers.response import Response
 from dotenv import load_dotenv
 import os
@@ -44,7 +43,7 @@ def urls_list() -> Union[str, Response]:
 
 
 @app.post('/urls')
-def adding_url() -> Union[str, Response]:
+def adding_url() -> Union[str, Response] | Union[tuple[str, int], Response]:
     url = request.form.get('url')
     if url is not None:
         errors = get_errors_validate_url(url)
@@ -57,7 +56,7 @@ def adding_url() -> Union[str, Response]:
             case _:
                 pass
         messages = get_flashed_messages(with_categories=True)
-        return render_template('index.html', url=url, messages=messages)
+        return render_template('index.html', url=url, messages=messages), 422
 
     url = get_norm_url(url)
 
