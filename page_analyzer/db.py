@@ -4,7 +4,7 @@ from psycopg2.extensions import connection
 import datetime
 from typing import Callable
 from .exceptions import Custom_exception_db
-from typing import Any, Optional, NamedTuple
+from typing import Optional, NamedTuple
 
 
 def catch_exceptions_psycopg2(func: Callable) -> Callable:
@@ -45,7 +45,7 @@ def get_urls_list(conn: connection) -> list[dict]:
         checks = cur.fetchall()
 
         urls_with_checks: list = []
-        check_found: extras.DictRow | dict= {}
+        check_found: extras.DictRow | dict = {}
         for url in urls:
             for check in checks:
                 if url['id'] == check['url_id']:
@@ -97,7 +97,7 @@ def add_url(url: str, conn: connection) -> int | None:
 
 
 @catch_exceptions_psycopg2
-def get_url_by_id(id: int, conn: connection) -> NamedTuple | None:
+def get_url_by_id(id: int, conn: connection) -> Optional[NamedTuple]:
     with conn.cursor(cursor_factory=extras.NamedTupleCursor) as cur:
         cur.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         url = cur.fetchone()
