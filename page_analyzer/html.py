@@ -15,11 +15,14 @@ def get_data_check(url: Url_record_NTuple) -> tuple[str, str, str, int] | None:
         h1 = soup.h1.text if soup.h1 else ''
         title = soup.title.text if soup.title else ''
 
-        descr = soup.find("meta", attrs={"name": "description"})
-        descr_content = descr.get('content', '') \
-            if descr and type(descr) is Tag else ''
+        # descr = soup.find("meta", attrs={"name": "description"})
+        # descr_content = descr.get('content', '') \
+        #     if descr and type(descr) is Tag else ''
 
-        descr_result = str(descr_content)
+        # descr_result = str(descr_content)
+        descr = soup.find("meta", attrs={'name': 'description'})
+        descr = descr.get('content', '') if descr else ''
     except (requests.RequestException, ValueError):
         return None
-    return (h1, title, descr_result, status_code)
+    # return (h1, title, descr_result, status_code)
+    return (h1, title, descr, status_code)
