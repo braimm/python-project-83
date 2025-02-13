@@ -44,10 +44,22 @@ def urls_list() -> Union[str, Response]:
 
 @app.post('/urls')
 def adding_url() -> Union[str, Response] | Union[tuple[str, int], Response]:
+    # url = request.form.get('url')
+    # if url is not None:
+    #     errors = get_errors_validate_url(url)
+    # if errors or url is None:
+    #     match errors:
+    #         case 'bad_url':
+    #             flash('Некорректный URL', 'danger')
+    #         case 'long_url':
+    #             flash('URL превышает 255 символов', 'danger')
+    #         case _:
+    #             pass
+    #     messages = get_flashed_messages(with_categories=True)
+    #     return render_template('index.html', url=url, messages=messages), 422
     url = request.form.get('url')
-    if url is not None:
-        errors = get_errors_validate_url(url)
-    if errors or url is None:
+    errors = get_errors_validate_url(url)
+    if errors:
         match errors:
             case 'bad_url':
                 flash('Некорректный URL', 'danger')
@@ -57,7 +69,6 @@ def adding_url() -> Union[str, Response] | Union[tuple[str, int], Response]:
                 pass
         messages = get_flashed_messages(with_categories=True)
         return render_template('index.html', url=url, messages=messages), 422
-
     url = get_norm_url(url)
 
     try:
