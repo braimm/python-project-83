@@ -4,15 +4,18 @@ from dotenv import load_dotenv
 import os
 from .db import get_url_info, add_url, add_url_check
 from .db import get_urls_list, connect_db, get_url_by_name, get_url_by_id
-from .html import get_data_check, show_page_errors_db
+from .html import get_data_check
 from .validators import get_errors_validate_url, get_norm_url, prepare_write_db
-import requests
+from .exceptions import Custom_exception_db
+# import logging
 
 
 app = Flask(__name__)
 load_dotenv(override=True)
 app.secret_key = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
+# logging.basicConfig(level=logging.INFO, filename="py_log.log", filemode="w",
+#                     format="%(asctime)s %(levelname)s %(message)s")
 
 
 @app.get('/')
@@ -20,13 +23,20 @@ def index():
     return render_template('index.html')
 
 
+@app.get('/errors')
+def errors_page():
+    messages = get_flashed_messages(with_categories=True)
+    return render_template('errors.html', messages=messages)
+
+
 @app.get('/urls')
 def urls_list():
     try:
         with connect_db(DATABASE_URL) as conn:
             urls = get_urls_list(conn)
-    except Exception:
-        show_page_errors_db()
+    except Custom_exception_db:
+        flash('Произошла ошибка', 'danger')
+        redirect(url_for('errors'), 302)
     return render_template('urls.html', urls=urls)
 
 
@@ -51,13 +61,16 @@ def adding_url():
         with connect_db(DATABASE_URL) as conn:
             record = get_url_by_name(url, conn)
             if record:
-                id = record[0]
+                id = record.id
                 flash('Страница уже существует', 'info')
             else:
                 id = add_url(url, conn)
+                if id is None:
+                    raise Custom_exception_db
                 flash('Страница успешно добавлена', 'success')
-    except Exception:
-        show_page_errors_db()
+    except Custom_exception_db:
+        flash('Произошла ошибка', 'danger')
+        redirect(url_for('errors'), 302)
     return redirect(url_for('url_page', id=id), 302)
 
 
@@ -66,9 +79,10 @@ def url_page(id):
     try:
         with connect_db(DATABASE_URL) as conn:
             url, checks = get_url_info(id, conn)
-    except Exception:
-        show_page_errors_db()
-    messages = get_flashed_messages(with_categories=True)
+        messages = get_flashed_messages(with_categories=True)
+    except Custom_exception_db:
+        flash('Произошла ошибка', 'danger')
+        redirect(url_for('errors'), 302)
     return render_template('url.html',
                            messages=messages,
                            url=url,
@@ -81,12 +95,13 @@ def url_check(id):
         with connect_db(DATABASE_URL) as conn:
             url = get_url_by_id(id, conn)
             data_check = get_data_check(url)
+            if data_check is None:
+                flash('Произошла ошибка при проверке', 'danger')
+                return redirect(url_for('url_page', id=id), 302)
             data_check = prepare_write_db(data_check)
             add_url_check(id, data_check, conn)
             flash('Страница успешно проверена', 'success')
-    except (requests.RequestException, ValueError):
-        flash('Произошла ошибка при проверке', 'danger')
-        return redirect(url_for('url_page', id=id), 302)
-    except Exception:
-        show_page_errors_db()
+    except Custom_exception_db:
+        flash('Произошла ошибка', 'danger')
+        redirect(url_for('errors'), 302)
     return redirect(url_for('url_page', id=id), 302)

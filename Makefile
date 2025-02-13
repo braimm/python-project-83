@@ -11,5 +11,8 @@ dev:
 build:
 	./build.sh
 
+mypy:
+	poetry run mypy page_analyzer/db.py
+
 lint:
 	poetry run flake8 page_analyzer
