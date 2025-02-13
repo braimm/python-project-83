@@ -10,9 +10,7 @@ def get_errors_validate_url(url: str) -> str | None:
     return None
 
 
-def get_norm_url(url: str | None) -> str:
-    if url is None:
-        return ''
+def get_norm_url(url: str) -> str:
     result = parse.urlparse(url)
     return f'{result.scheme}://{result.netloc}'
 
