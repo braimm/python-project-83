@@ -9,15 +9,12 @@ from .html import get_data_check
 from .validators import get_errors_validate_url, get_norm_url, prepare_write_db
 from .exceptions import Custom_exception_db
 from typing import Union
-# import logging
 
 
 app = Flask(__name__)
 load_dotenv(override=True)
 app.secret_key = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
-# logging.basicConfig(level=logging.INFO, filename="py_log.log", filemode="w",
-#                     format="%(asctime)s %(levelname)s %(message)s")
 
 
 @app.get('/')
@@ -57,18 +54,6 @@ def adding_url() -> Union[str, Response] | Union[tuple[str, int], Response]:
                 pass
         messages = get_flashed_messages(with_categories=True)
         return render_template('index.html', url=url, messages=messages), 422
-    # url = request.form.get('url')
-    # errors = get_errors_validate_url(url)
-    # if errors:
-    #     match errors:
-    #         case 'bad_url':
-    #             flash('Некорректный URL', 'danger')
-    #         case 'long_url':
-    #             flash('URL превышает 255 символов', 'danger')
-    #         case _:
-    #             pass
-    #     messages = get_flashed_messages(with_categories=True)
-    #     return render_template('index.html', url=url, messages=messages), 422
 
     url = get_norm_url(url)
 

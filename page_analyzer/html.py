@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup, Tag
-# from bs4 import BeautifulSoup
 from .my_types import Url_record_NTuple
 
 
@@ -21,9 +20,6 @@ def get_data_check(url: Url_record_NTuple) -> tuple[str, str, str, int] | None:
             if descr and type(descr) is Tag else ''
 
         descr_result = str(descr_content)
-        # descr = soup.find("meta", attrs={'name': 'description'})
-        # descr = descr.get('content', '') if descr else ''
     except (requests.RequestException, ValueError):
         return None
     return (h1, title, descr_result, status_code)
-    # return (h1, title, descr, status_code)
