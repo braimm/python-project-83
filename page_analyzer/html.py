@@ -1,6 +1,12 @@
 import requests
 from bs4 import BeautifulSoup, Tag
-from .my_types import Url_record_NTuple
+from typing import NamedTuple
+
+
+class Url_record_NTuple(NamedTuple):
+    id: int
+    name: str
+    created_at: str
 
 
 def get_data_check(url: Url_record_NTuple) -> tuple[str, str, str, int] | None:
